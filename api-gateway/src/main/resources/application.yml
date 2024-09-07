@@ -1,0 +1,66 @@
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      routes:
+        - id: USER-SERVICE-APP
+          uri: lb://USER-SERVICE-APP
+          predicates:
+            - Path=/api/users/**
+        - id: QUIZ-SERVICE
+          uri: lb://QUIZ-SERVICE
+          predicates:
+            - Path=/api/quizzes/**,/graphql
+
+        - id: QUESTIONS-SERVICE
+          uri: lb://QUESTIONS-SERVICE
+          predicates:
+            - Path=/api/questions/**
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8079/realms/apps
+      client:
+        registration:
+          keycloak:
+            client-id: quiz-microservices-app
+            client-secret: tj06nGMzictoLszePyVMqYNaaU60hm24
+            authorization-grant-type: authorization_code
+            scope:
+              - openid
+              - email
+              - profile
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8079/realms/apps
+
+
+
+server:
+  port: 8083
+eureka:
+  client:
+    service-url:
+      default-zone: http://localhost:8761/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+
+
+
+  tracing:
+    sampling:
+      probability: 1.0
+
+
+
